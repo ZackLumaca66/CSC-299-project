@@ -1,3 +1,10 @@
+from datetime import datetime
+try:
+    UTC = datetime.UTC
+except AttributeError:
+    from datetime import timezone as _tz
+    UTC = _tz.utc
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 from typing import List, Dict, Any
 import json
 import os
