@@ -1,0 +1,62 @@
+Metadata-Version: 2.4
+Name: spec-kit-task-manager
+Version: 0.1.0
+Summary: CLI task manager MVP (create, list, search)
+Author: Project
+License: UNLICENSED
+Keywords: cli,tasks,json
+Classifier: Programming Language :: Python :: 3
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0.0; extra == "dev"
+Requires-Dist: coverage>=7.0.0; extra == "dev"
+
+# spec-kit-task-manager
+
+CLI task manager MVP providing:
+- Create task (title required, optional description & status)
+- List tasks (optional status filter)
+- Search tasks by substring (title + description, case-insensitive)
+
+Persistence: single JSON file `tasks.json` with `schema_version` for future migrations (SQLite / Neo4J). Atomic writes planned via temp file replacement.
+
+## Planned CLI Commands (MVP)
+- `tasks create --title "Write spec" [--description "Initial"] [--status in-progress] [--json]`
+- `tasks list [--status done] [--json]`
+- `tasks search --query spec [--json]`
+- `tasks seed --json` (optional sample tasks injection)
+
+## Output Modes
+Human-readable default; structured JSON with `--json` flag. Errors: stderr + non-zero exit codes; JSON mode returns `{ "error": { "type": ..., "message": ... } }`.
+
+## Development Principles (Excerpt)
+- TDD first (pytest), ≥90% line coverage on changed modules.
+- Function size ≤40 lines; single responsibility.
+- Repository abstracts persistence; CLI never writes files directly.
+
+## Project Structure (planned)
+```
+src/
+  cli/
+  models/
+  repository/
+  services/
+```
+
+## Installation (dev)
+```bash
+python -m venv .venv
+. .venv/Scripts/activate  # Windows PowerShell
+pip install -e .[dev]
+```
+
+## Running Tests
+```bash
+pytest
+```
+
+## Future
+- Add update/delete
+- Migrate to SQLite or Neo4J backend
+- Introduce indexing for search performance if >5k tasks

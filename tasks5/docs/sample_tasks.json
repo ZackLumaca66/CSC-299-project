@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {"id": 1, "title": "Write spec", "description": "Initial MVP document", "status": "todo"},
+    {"id": 2, "title": "Implement models", "description": "Task & status validation", "status": "in-progress"},
+    {"id": 3, "title": "Add create command", "description": "CLI user story 1", "status": "done"},
+    {"id": 4, "title": "List tasks", "description": "CLI user story 2", "status": "in-progress"},
+    {"id": 5, "title": "Search tasks", "description": "CLI user story 3", "status": "todo"}
+  ]
+}
