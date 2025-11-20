@@ -1,0 +1,78 @@
+# spec-kit-task-manager
+
+CLI Task Manager MVP providing:
+- Create tasks (title required, optional description & status)
+- List tasks (optional status filter)
+- Search tasks by substring (title + description, case-insensitive)
+
+Persistence: single JSON file `tasks.json` with `schema_version` for future migrations (SQLite / Neo4J). Atomic writes via temp file replacement; corruption triggers automatic backup `tasks.json.bak-<timestamp>` and fresh store initialization.
+
+## Usage Examples
+
+Human mode:
+```bash
+python -m src.cli.main create --title "Write spec" --description "Initial MVP"
+python -m src.cli.main list --status done
+python -m src.cli.main search spec
+```
+
+JSON mode (machine readable):
+```bash
+python -m src.cli.main --json create --title "Write spec" --status in-progress
+python -m src.cli.main --json list --status todo
+python -m src.cli.main --json search Clarity
+```
+
+Blank queries / invalid input return non-zero exit codes and structured JSON errors when `--json` provided.
+
+## Output Modes
+Human-readable default; structured JSON with `--json` flag. Errors: stderr + non-zero exit codes; JSON mode returns:
+```json
+{"error": {"type": "error", "message": "Explanation"}}
+```
+
+## Development Principles (Excerpt)
+- TDD first (pytest), ≥90% line coverage on changed modules.
+- Function size ≤40 lines; single responsibility.
+- Repository abstracts persistence; CLI never writes files directly.
+
+## Project Structure (planned)
+```
+src/
+  cli/
+  models/
+  repository/
+  services/
+```
+
+## Installation (dev)
+```bash
+python -m venv .venv
+. .venv/Scripts/activate  # Windows PowerShell
+pip install -e .[dev]
+```
+
+## Running Tests & Coverage
+```bash
+python -m pytest -q
+```
+Generate coverage HTML:
+```bash
+python -m pytest --cov=src --cov-report=html
+```
+Add a badge (manual step): capture total coverage from report and embed a Shields link, e.g.
+```
+![coverage](https://img.shields.io/badge/coverage-94%25-brightgreen)
+```
+
+## Migration Outline (Summary)
+See `docs/migration.md` for full plan. Replace JSON repository by new implementation exposing same public methods:
+1. Implement `SqlTaskRepository` with identical interface (`load_all_tasks`, `save_new_task`).
+2. Provide schema migration script converting `tasks.json` rows to SQL table.
+3. Keep CLI layer unchanged; switch import in one place.
+4. For Neo4J: map tasks to nodes with labels; status as property; indexing on `title`.
+
+## Future Enhancements
+- Add update/delete capabilities.
+- SQLite or Neo4J backend swap (repository abstraction maintained).
+- Introduce indexing for search performance if >5k tasks.
